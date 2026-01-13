@@ -1,0 +1,204 @@
+name: Auto-Update Manifests
+
+on:
+  # Triggered by source repos on release
+  repository_dispatch:
+    types: [manifest-update]
+
+  # Manual trigger for testing
+  workflow_dispatch:
+    inputs:
+      tool:
+        description: "Tool to update (cass, xf, cm)"
+        required: true
+        type: choice
+        options:
+          - cass
+          - xf
+          - cm
+      version:
+        description: "Version to update to (e.g., 0.1.56)"
+        required: true
+        type: string
+
+  # Fallback: Check for updates every 6 hours
+  schedule:
+    - cron: "0 */6 * * *"
+
+jobs:
+  # Handle repository_dispatch events
+  update-from-dispatch:
+    name: Update from Dispatch
+    runs-on: ubuntu-latest
+    if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine tool and version
+        id: params
+        run: |
+          if [[ "${{ github.event_name }}" == "repository_dispatch" ]]; then
+            echo "tool=${{ github.event.client_payload.tool }}" >> $GITHUB_OUTPUT
+            echo "version=${{ github.event.client_payload.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "tool=${{ inputs.tool }}" >> $GITHUB_OUTPUT
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create scripts directory
+        run: mkdir -p scripts
+
+      - name: Update manifest
+        run: |
+          TOOL="${{ steps.params.outputs.tool }}"
+          VERSION="${{ steps.params.outputs.version }}"
+          VERSION="${VERSION#v}"  # Strip v prefix
+          MANIFEST="${TOOL}.json"
+
+          if [[ ! -f "$MANIFEST" ]]; then
+            echo "Manifest not found: $MANIFEST"
+            exit 1
+          fi
+
+          # Get new checksum based on tool
+          case "$TOOL" in
+            cass)
+              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/coding_agent_session_search/releases/download/v${VERSION}/coding-agent-search-x86_64-pc-windows-msvc.zip.sha256" | cut -d' ' -f1)
+              ;;
+            xf)
+              SUMS=$(curl -sL "https://github.com/Dicklesworthstone/xf/releases/download/v${VERSION}/SHA256SUMS")
+              CHECKSUM=$(echo "$SUMS" | grep "x86_64-pc-windows-msvc" | cut -d' ' -f1)
+              ;;
+            cm)
+              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/cass_memory_system/releases/download/v${VERSION}/cass-memory-windows-x64.exe.sha256" | cut -d' ' -f1)
+              ;;
+          esac
+
+          echo "New checksum: $CHECKSUM"
+
+          # Update manifest
+          jq --arg version "$VERSION" --arg hash "$CHECKSUM" \
+            '.version = $version | if .architecture then .architecture."64bit".hash = $hash else .hash = $hash end' \
+            "$MANIFEST" > "${MANIFEST}.tmp"
+          mv "${MANIFEST}.tmp" "$MANIFEST"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add *.json
+          git commit -m "chore(manifest): update ${{ steps.params.outputs.tool }} to v${{ steps.params.outputs.version }}"
+          git push
+
+  # Scheduled check for updates
+  check-updates:
+    name: Check for Updates
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - tool: cass
+            repo: Dicklesworthstone/coding_agent_session_search
+          - tool: xf
+            repo: Dicklesworthstone/xf
+          - tool: cm
+            repo: Dicklesworthstone/cass_memory_system
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get current version in manifest
+        id: current
+        run: |
+          manifest="${{ matrix.tool }}.json"
+          if [[ ! -f "$manifest" ]]; then
+            echo "Manifest not found, skipping"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          version=$(jq -r '.version' "$manifest")
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "Current version of ${{ matrix.tool }}: $version"
+
+      - name: Get latest release version
+        id: latest
+        if: steps.current.outputs.skip != 'true'
+        run: |
+          latest=$(curl -s "https://api.github.com/repos/${{ matrix.repo }}/releases/latest" | jq -r '.tag_name // empty' | sed 's/^v//')
+          if [[ -z "$latest" ]]; then
+            echo "Could not determine latest version"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "version=$latest" >> $GITHUB_OUTPUT
+          echo "Latest version of ${{ matrix.tool }}: $latest"
+
+      - name: Compare versions
+        id: compare
+        if: steps.current.outputs.skip != 'true' && steps.latest.outputs.skip != 'true'
+        run: |
+          current="${{ steps.current.outputs.version }}"
+          latest="${{ steps.latest.outputs.version }}"
+
+          if [[ "$current" == "$latest" ]]; then
+            echo "Already up to date"
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+          else
+            echo "Update available: $current -> $latest"
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update manifest
+        if: steps.compare.outputs.needs_update == 'true'
+        run: |
+          TOOL="${{ matrix.tool }}"
+          VERSION="${{ steps.latest.outputs.version }}"
+          MANIFEST="${TOOL}.json"
+
+          # Get new checksum based on tool
+          case "$TOOL" in
+            cass)
+              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/coding_agent_session_search/releases/download/v${VERSION}/coding-agent-search-x86_64-pc-windows-msvc.zip.sha256" | cut -d' ' -f1)
+              ;;
+            xf)
+              SUMS=$(curl -sL "https://github.com/Dicklesworthstone/xf/releases/download/v${VERSION}/SHA256SUMS")
+              CHECKSUM=$(echo "$SUMS" | grep "x86_64-pc-windows-msvc" | cut -d' ' -f1)
+              ;;
+            cm)
+              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/cass_memory_system/releases/download/v${VERSION}/cass-memory-windows-x64.exe.sha256" | cut -d' ' -f1)
+              ;;
+          esac
+
+          echo "New checksum: $CHECKSUM"
+
+          # Update manifest
+          jq --arg version "$VERSION" --arg hash "$CHECKSUM" \
+            '.version = $version | if .architecture then .architecture."64bit".hash = $hash else .hash = $hash end' \
+            "$MANIFEST" > "${MANIFEST}.tmp"
+          mv "${MANIFEST}.tmp" "$MANIFEST"
+
+      - name: Commit and push
+        if: steps.compare.outputs.needs_update == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add *.json
+          git commit -m "chore(manifest): auto-update ${{ matrix.tool }} to v${{ steps.latest.outputs.version }}"
+          git push

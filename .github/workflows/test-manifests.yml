@@ -8,6 +8,15 @@ on:
   pull_request:
     paths:
       - "*.json"
+  schedule:
+    # Weekly Monday 6am UTC - catch dependency/runner updates that break manifests
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      manifest:
+        description: "Specific manifest to test (leave empty for all)"
+        required: false
+        type: string
 
 jobs:
   validate:
@@ -80,6 +89,19 @@ jobs:
         shell: pwsh
         run: |
           scoop bucket add local .
+
+      - name: Record platform info
+        shell: pwsh
+        run: |
+          $summary = @"
+          ### Platform Info - Windows
+          - OS: Windows Server (windows-latest)
+          - Arch: $env:PROCESSOR_ARCHITECTURE
+          - PowerShell: $($PSVersionTable.PSVersion)
+          - Scoop: $(scoop --version | Select-Object -First 1)
+
+          "@
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value $summary
 
       - name: Test each manifest
         shell: pwsh

@@ -1,0 +1,188 @@
+name: Test Scoop Manifests
+
+on:
+  push:
+    paths:
+      - "*.json"
+      - ".github/workflows/test-manifests.yml"
+  pull_request:
+    paths:
+      - "*.json"
+
+jobs:
+  validate:
+    name: Validate JSON Manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON syntax
+        run: |
+          failed=0
+          for manifest in *.json; do
+            echo "::group::Validating $manifest"
+            if jq empty "$manifest" 2>&1; then
+              echo "JSON syntax valid"
+
+              # Check required fields
+              version=$(jq -r '.version // empty' "$manifest")
+              if [[ -z "$version" ]]; then
+                echo "::error::Missing 'version' field in $manifest"
+                failed=1
+              else
+                echo "Version: $version"
+              fi
+
+              homepage=$(jq -r '.homepage // empty' "$manifest")
+              if [[ -z "$homepage" ]]; then
+                echo "::warning::Missing 'homepage' field in $manifest"
+              else
+                echo "Homepage: $homepage"
+              fi
+
+              # Check architecture
+              if jq -e '.architecture' "$manifest" > /dev/null 2>&1; then
+                echo "Architecture-specific manifest detected"
+                arch_64=$(jq -e '.architecture."64bit"' "$manifest" > /dev/null 2>&1 && echo "yes" || echo "no")
+                arch_arm=$(jq -e '.architecture.arm64' "$manifest" > /dev/null 2>&1 && echo "yes" || echo "no")
+                echo "  64bit: $arch_64"
+                echo "  arm64: $arch_arm"
+              elif jq -e '.url' "$manifest" > /dev/null 2>&1; then
+                echo "Single-architecture manifest"
+              else
+                echo "::error::No download URL found in $manifest"
+                failed=1
+              fi
+
+            else
+              echo "::error::Invalid JSON in $manifest"
+              failed=1
+            fi
+            echo "::endgroup::"
+          done
+
+          exit $failed
+
+  install-test:
+    name: Install Test (Windows)
+    runs-on: windows-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Scoop
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+          Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+
+      - name: Add local bucket
+        shell: pwsh
+        run: |
+          scoop bucket add local .
+
+      - name: Test each manifest
+        shell: pwsh
+        run: |
+          $failed = 0
+          $manifests = Get-ChildItem -Filter "*.json"
+
+          foreach ($manifest in $manifests) {
+            $tool = $manifest.BaseName
+            Write-Host "========================================"
+            Write-Host "Testing: $tool"
+            Write-Host "========================================"
+
+            # Create log directory
+            $logDir = "$env:TEMP\scoop-tests"
+            New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+            $logFile = "$logDir\$tool.log"
+
+            try {
+              # Install
+              Write-Host "--- Installing $tool ---"
+              $installOutput = scoop install $tool 2>&1 | Tee-Object -FilePath $logFile -Append
+              if ($LASTEXITCODE -ne 0) {
+                Write-Host "::error::Install failed for $tool"
+                $failed = 1
+                continue
+              }
+              Write-Host "Install succeeded"
+
+              # Version check
+              Write-Host "--- Version check ---"
+              try {
+                $versionOutput = & $tool --version 2>&1
+                Write-Host "Version: $versionOutput"
+                Add-Content -Path $logFile -Value "Version: $versionOutput"
+              } catch {
+                try {
+                  $versionOutput = & $tool version 2>&1
+                  Write-Host "Version: $versionOutput"
+                  Add-Content -Path $logFile -Value "Version: $versionOutput"
+                } catch {
+                  Write-Host "No version command available"
+                  Add-Content -Path $logFile -Value "No version command available"
+                }
+              }
+
+              # Uninstall
+              Write-Host "--- Uninstalling $tool ---"
+              $uninstallOutput = scoop uninstall $tool 2>&1 | Tee-Object -FilePath $logFile -Append
+              Write-Host "Uninstall succeeded"
+
+              Write-Host "Test passed for $tool"
+              Write-Host ""
+
+            } catch {
+              Write-Host "::error::Test failed for $tool : $_"
+              Add-Content -Path $logFile -Value "ERROR: $_"
+              $failed = 1
+            }
+          }
+
+          if ($failed -ne 0) {
+            exit 1
+          }
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scoop-test-logs
+          path: ${{ env.TEMP }}\scoop-tests\
+          if-no-files-found: ignore
+
+  checkver:
+    name: Check Version Updates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for outdated versions
+        run: |
+          echo "Checking for version updates..."
+          for manifest in *.json; do
+            tool=$(basename "$manifest" .json)
+            version=$(jq -r '.version' "$manifest")
+            homepage=$(jq -r '.homepage // "unknown"' "$manifest")
+
+            echo "::group::$tool"
+            echo "Current version: $version"
+            echo "Homepage: $homepage"
+
+            # Try to get latest version from GitHub releases if homepage is GitHub
+            if [[ "$homepage" == *"github.com"* ]]; then
+              repo=$(echo "$homepage" | sed 's|https://github.com/||')
+              latest=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | jq -r '.tag_name // empty' 2>/dev/null | sed 's/^v//')
+              if [[ -n "$latest" && "$latest" != "$version" ]]; then
+                echo "::notice::New version available: $latest (current: $version)"
+              elif [[ -n "$latest" ]]; then
+                echo "Up to date"
+              else
+                echo "Could not determine latest version"
+              fi
+            fi
+
+            echo "::endgroup::"
+          done

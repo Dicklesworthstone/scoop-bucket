@@ -55,20 +55,23 @@ esac
 
 echo "Checksum: $CHECKSUM"
 
-# Update the manifest using jq
-jq --arg version "$VERSION" --arg hash "$CHECKSUM" '.version = $version | .hash = $hash | if .architecture then .architecture."64bit".hash = $hash else . end' "$MANIFEST_FILE" > "${MANIFEST_FILE}.tmp"
-mv "${MANIFEST_FILE}.tmp" "$MANIFEST_FILE"
-
-# Update URL if architecture-specific
+# Update the manifest using jq (version, hash, and URL in one pass)
 if jq -e '.architecture' "$MANIFEST_FILE" > /dev/null 2>&1; then
-  # Update architecture-specific URL
-  jq --arg version "$VERSION" '.architecture."64bit".url = (.architecture."64bit".url | gsub("v[0-9.]+"; "v" + $version))' "$MANIFEST_FILE" > "${MANIFEST_FILE}.tmp"
-  mv "${MANIFEST_FILE}.tmp" "$MANIFEST_FILE"
+  # Architecture-specific manifest (cass, xf)
+  jq --arg version "$VERSION" --arg hash "$CHECKSUM" '
+    .version = $version |
+    .architecture."64bit".hash = $hash |
+    .architecture."64bit".url = (.architecture."64bit".url | gsub("v[0-9.]+"; "v" + $version))
+  ' "$MANIFEST_FILE" > "${MANIFEST_FILE}.tmp"
 else
-  # Update simple URL
-  jq --arg version "$VERSION" '.url = (.url | gsub("v[0-9.]+"; "v" + $version))' "$MANIFEST_FILE" > "${MANIFEST_FILE}.tmp"
-  mv "${MANIFEST_FILE}.tmp" "$MANIFEST_FILE"
+  # Simple manifest (cm)
+  jq --arg version "$VERSION" --arg hash "$CHECKSUM" '
+    .version = $version |
+    .hash = $hash |
+    .url = (.url | gsub("v[0-9.]+"; "v" + $version))
+  ' "$MANIFEST_FILE" > "${MANIFEST_FILE}.tmp"
 fi
+mv "${MANIFEST_FILE}.tmp" "$MANIFEST_FILE"
 
 echo "Manifest updated: $MANIFEST_FILE"
 echo ""

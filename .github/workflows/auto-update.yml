@@ -78,10 +78,12 @@ jobs:
 
           echo "New checksum: $CHECKSUM"
 
-          # Update manifest
-          jq --arg version "$VERSION" --arg hash "$CHECKSUM" \
-            '.version = $version | if .architecture then .architecture."64bit".hash = $hash else .hash = $hash end' \
-            "$MANIFEST" > "${MANIFEST}.tmp"
+          # Update manifest (version, hash, and URL)
+          jq --arg version "$VERSION" --arg hash "$CHECKSUM" '
+            .version = $version |
+            (if .architecture then .architecture."64bit".hash = $hash else .hash = $hash end) |
+            (if .architecture then .architecture."64bit".url = (.architecture."64bit".url | gsub("v[0-9.]+"; "v" + $version)) else .url = (.url | gsub("v[0-9.]+"; "v" + $version)) end)
+          ' "$MANIFEST" > "${MANIFEST}.tmp"
           mv "${MANIFEST}.tmp" "$MANIFEST"
 
       - name: Commit and push
@@ -182,10 +184,12 @@ jobs:
 
           echo "New checksum: $CHECKSUM"
 
-          # Update manifest
-          jq --arg version "$VERSION" --arg hash "$CHECKSUM" \
-            '.version = $version | if .architecture then .architecture."64bit".hash = $hash else .hash = $hash end' \
-            "$MANIFEST" > "${MANIFEST}.tmp"
+          # Update manifest (version, hash, and URL)
+          jq --arg version "$VERSION" --arg hash "$CHECKSUM" '
+            .version = $version |
+            (if .architecture then .architecture."64bit".hash = $hash else .hash = $hash end) |
+            (if .architecture then .architecture."64bit".url = (.architecture."64bit".url | gsub("v[0-9.]+"; "v" + $version)) else .url = (.url | gsub("v[0-9.]+"; "v" + $version)) end)
+          ' "$MANIFEST" > "${MANIFEST}.tmp"
           mv "${MANIFEST}.tmp" "$MANIFEST"
 
       - name: Commit and push

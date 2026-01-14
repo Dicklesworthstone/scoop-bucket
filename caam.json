@@ -1,0 +1,15 @@
+{
+    "version": "0.1.2",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Dicklesworthstone/coding_agent_account_manager/releases/download/v0.1.2/caam_0.1.2_windows_amd64.zip",
+            "bin": [
+                "caam.exe"
+            ],
+            "hash": "774da0285b5a61230d9e53d357160ccb1d2615754ae91a949e5430f9d5ec9ad9"
+        }
+    },
+    "homepage": "https://github.com/Dicklesworthstone/coding_agent_account_manager",
+    "license": "MIT",
+    "description": "CLI tool for managing AI coding agent accounts and configurations"
+}

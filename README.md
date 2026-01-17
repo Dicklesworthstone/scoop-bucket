@@ -295,19 +295,41 @@ Every push to manifest files triggers:
 | **Install Test** | Full install/version/uninstall cycle on Windows |
 | **Version Check** | Compares manifest versions against latest GitHub releases |
 
+### Required Secrets for Auto-Updates
+
+For source repositories to trigger automatic manifest updates via `repository_dispatch`, they need a Personal Access Token (PAT) with permission to trigger workflows on this repository.
+
+#### Source Repository Secrets
+
+| Secret Name | Purpose | Required Scope |
+|-------------|---------|----------------|
+| `SCOOP_BUCKET_TOKEN` | Trigger `manifest-update` event | `contents:write` on `Dicklesworthstone/scoop-bucket` |
+
+#### Source Repositories
+
+| Repository | Has Windows Build |
+|------------|-------------------|
+| `coding_agent_session_search` (cass) | Yes |
+| `xf` | Yes |
+| `cass_memory_system` (cm) | Yes |
+
 ### Triggering Updates from Source Repos
 
-Source repositories can trigger automatic manifest updates by sending a `repository_dispatch` event:
+Source repositories trigger automatic manifest updates by sending a `repository_dispatch` event:
 
 ```yaml
 # In the source repo's release workflow
 - name: Trigger Scoop bucket update
-  uses: peter-evans/repository-dispatch@v2
+  uses: peter-evans/repository-dispatch@v3
   with:
-    token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+    token: ${{ secrets.SCOOP_BUCKET_TOKEN }}
     repository: Dicklesworthstone/scoop-bucket
     event-type: manifest-update
-    client-payload: '{"tool": "cass", "version": "${{ github.ref_name }}"}'
+    client-payload: |
+      {
+        "tool": "cass",
+        "version": "${{ needs.release.outputs.version }}"
+      }
 ```
 
 ## Directory Structure

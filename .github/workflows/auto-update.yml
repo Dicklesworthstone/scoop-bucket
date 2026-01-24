@@ -25,6 +25,13 @@ on:
   schedule:
     - cron: "0 */6 * * *"
 
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-update-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   # Handle repository_dispatch events
   update-from-dispatch:
@@ -205,4 +212,15 @@ jobs:
 
           git add *.json
           git commit -m "chore(manifest): auto-update ${{ matrix.tool }} to v${{ steps.latest.outputs.version }}"
-          git push
+
+          # Retry push with rebase to handle concurrent updates
+          for i in 1 2 3; do
+            if git push; then
+              echo "Push successful"
+              exit 0
+            fi
+            echo "Push failed, attempt $i of 3. Pulling and retrying..."
+            git pull --rebase origin main
+          done
+          echo "Push failed after 3 attempts"
+          exit 1

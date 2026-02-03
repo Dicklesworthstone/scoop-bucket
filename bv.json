@@ -1,12 +1,12 @@
 {
-    "version": "0.13.0",
+    "version": "0.14.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Dicklesworthstone/beads_viewer/releases/download/v0.13.0/bv_0.13.0_windows_amd64.tar.gz",
+            "url": "https://github.com/Dicklesworthstone/beads_viewer/releases/download/v0.14.1/bv_0.14.1_windows_amd64.tar.gz",
             "bin": [
                 "bv.exe"
             ],
-            "hash": "05cd98297d256747ef755b333ec433e778dd5d707510e06fb18887f2314a6fb7"
+            "hash": "f2a7388c426cfa154f1855565656499b5e6f4fd3e30fe316d5e26ce7d7d83ae6"
         }
     },
     "homepage": "https://github.com/Dicklesworthstone/beads_viewer",

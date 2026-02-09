@@ -9,13 +9,15 @@ on:
   workflow_dispatch:
     inputs:
       tool:
-        description: "Tool to update (cass, xf, cm)"
+        description: "Tool to update (cass, xf, cm, dcg, tru)"
         required: true
         type: choice
         options:
           - cass
           - xf
           - cm
+          - dcg
+          - tru
       version:
         description: "Version to update to (e.g., 0.1.56)"
         required: true
@@ -81,6 +83,12 @@ jobs:
             cm)
               CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/cass_memory_system/releases/download/v${VERSION}/cass-memory-windows-x64.exe.sha256" | cut -d' ' -f1)
               ;;
+            dcg)
+              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/destructive_command_guard/releases/download/v${VERSION}/dcg-x86_64-pc-windows-msvc.zip.sha256" | cut -d' ' -f1)
+              ;;
+            tru)
+              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/toon_rust/releases/download/v${VERSION}/toon-windows-amd64.zip.sha256" | cut -d' ' -f1)
+              ;;
           esac
 
           echo "New checksum: $CHECKSUM"
@@ -122,6 +130,10 @@ jobs:
             repo: Dicklesworthstone/xf
           - tool: cm
             repo: Dicklesworthstone/cass_memory_system
+          - tool: dcg
+            repo: Dicklesworthstone/destructive_command_guard
+          - tool: tru
+            repo: Dicklesworthstone/toon_rust
     steps:
       - uses: actions/checkout@v4
         with:
@@ -186,6 +198,12 @@ jobs:
               ;;
             cm)
               CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/cass_memory_system/releases/download/v${VERSION}/cass-memory-windows-x64.exe.sha256" | cut -d' ' -f1)
+              ;;
+            dcg)
+              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/destructive_command_guard/releases/download/v${VERSION}/dcg-x86_64-pc-windows-msvc.zip.sha256" | cut -d' ' -f1)
+              ;;
+            tru)
+              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/toon_rust/releases/download/v${VERSION}/toon-windows-amd64.zip.sha256" | cut -d' ' -f1)
               ;;
           esac
 

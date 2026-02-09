@@ -46,9 +46,23 @@ case "$TOOL" in
     CHECKSUM=$(curl -sL "$CHECKSUM_URL" | cut -d' ' -f1)
     ;;
 
+  dcg)
+    URL="https://github.com/Dicklesworthstone/destructive_command_guard/releases/download/v${VERSION}/dcg-x86_64-pc-windows-msvc.zip"
+    CHECKSUM_URL="${URL}.sha256"
+    echo "Fetching checksum..."
+    CHECKSUM=$(curl -sL "$CHECKSUM_URL" | cut -d' ' -f1)
+    ;;
+
+  tru)
+    URL="https://github.com/Dicklesworthstone/toon_rust/releases/download/v${VERSION}/toon-windows-amd64.zip"
+    CHECKSUM_URL="${URL}.sha256"
+    echo "Fetching checksum..."
+    CHECKSUM=$(curl -sL "$CHECKSUM_URL" | cut -d' ' -f1)
+    ;;
+
   *)
     echo "Error: Unknown tool or tool not available for Windows: $TOOL"
-    echo "Supported tools: cass, xf, cm"
+    echo "Supported tools: cass, xf, cm, dcg, tru"
     exit 1
     ;;
 esac

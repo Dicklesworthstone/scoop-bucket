@@ -17,11 +17,29 @@ scoop install dicklesworthstone/cass
 
 ## Available Tools
 
-| Tool | Description | Version | Install |
-|------|-------------|---------|---------|
-| **[cass](https://github.com/Dicklesworthstone/coding_agent_session_search)** | Cross-agent session search - Index and search AI coding agent conversations | 0.1.55 | `scoop install dicklesworthstone/cass` |
-| **[xf](https://github.com/Dicklesworthstone/xf)** | X-Former - Search and analyze your Twitter/X archive data locally | 0.2.0 | `scoop install dicklesworthstone/xf` |
-| **[cm](https://github.com/Dicklesworthstone/cass_memory_system)** | CASS Memory System - Persistent vector-based procedural memory for AI agents | 0.2.3 | `scoop install dicklesworthstone/cm` |
+### Session Search & Memory
+
+| Tool | Description | Install |
+|------|-------------|---------|
+| **[cass](https://github.com/Dicklesworthstone/coding_agent_session_search)** | Cross-agent session search - Index and search AI coding agent conversations | `scoop install dicklesworthstone/cass` |
+| **[xf](https://github.com/Dicklesworthstone/xf)** | X-Former - Search and analyze your Twitter/X archive data locally | `scoop install dicklesworthstone/xf` |
+| **[cm](https://github.com/Dicklesworthstone/cass_memory_system)** | CASS Memory System - Persistent vector-based procedural memory for AI agents | `scoop install dicklesworthstone/cm` |
+
+### Task Management & Agent Orchestration
+
+| Tool | Description | Install |
+|------|-------------|---------|
+| **[bv](https://github.com/Dicklesworthstone/beads_viewer)** | Beads Viewer - Graph-aware task management TUI | `scoop install dicklesworthstone/bv` |
+| **[caam](https://github.com/Dicklesworthstone/coding_agent_account_manager)** | Coding Agent Account Manager - Switch between AI agent accounts | `scoop install dicklesworthstone/caam` |
+| **[slb](https://github.com/Dicklesworthstone/simultaneous_launch_button)** | Simultaneous Launch Button - Two-person rule for dangerous commands | `scoop install dicklesworthstone/slb` |
+| **[ntm](https://github.com/Dicklesworthstone/ntm)** | Named Tmux Manager - Orchestrate AI coding agents in tmux sessions | `scoop install dicklesworthstone/ntm` |
+
+### Safety & Encoding
+
+| Tool | Description | Install |
+|------|-------------|---------|
+| **[dcg](https://github.com/Dicklesworthstone/destructive_command_guard)** | Destructive Command Guard - Safety rails for AI coding agents | `scoop install dicklesworthstone/dcg` |
+| **[tru](https://github.com/Dicklesworthstone/toon_rust)** | TOON encoder/decoder - Token-Optimized Object Notation | `scoop install dicklesworthstone/tru` |
 
 ### Not Available on Windows
 
@@ -29,17 +47,6 @@ The following tools are Bash-based and only available on macOS/Linux via [Homebr
 
 - **ru** (Repo Updater) - Bash script
 - **ubs** (Ultimate Bug Scanner) - Bash script
-
-### Coming Soon (via GoReleaser)
-
-These tools will be automatically published when their GoReleaser configurations are set up:
-
-| Tool | Description | Status |
-|------|-------------|--------|
-| **[ntm](https://github.com/Dicklesworthstone/ntm)** | Named Tmux Manager - Orchestrate AI coding agents | Pending |
-| **[bv](https://github.com/Dicklesworthstone/beads_viewer)** | Beads Viewer - Graph-aware task management TUI | Pending |
-| **[caam](https://github.com/Dicklesworthstone/coding_agent_account_manager)** | Coding Agent Account Manager | Pending |
-| **[slb](https://github.com/Dicklesworthstone/simultaneous_launch_button)** | Simultaneous Launch Button - Two-person rule | Pending |
 
 ## Tool Details
 
@@ -307,11 +314,17 @@ For source repositories to trigger automatic manifest updates via `repository_di
 
 #### Source Repositories
 
-| Repository | Has Windows Build |
-|------------|-------------------|
-| `coding_agent_session_search` (cass) | Yes |
-| `xf` | Yes |
-| `cass_memory_system` (cm) | Yes |
+| Repository | Has Windows Build | Update Method |
+|------------|-------------------|---------------|
+| `coding_agent_session_search` (cass) | Yes | Auto-update workflow |
+| `xf` | Yes | Auto-update workflow |
+| `cass_memory_system` (cm) | Yes | Auto-update workflow |
+| `destructive_command_guard` (dcg) | Yes | Auto-update workflow |
+| `toon_rust` (tru) | Yes | Auto-update workflow |
+| `beads_viewer` (bv) | Yes | GoReleaser |
+| `coding_agent_account_manager` (caam) | Yes | GoReleaser |
+| `slb` | Yes | GoReleaser |
+| `ntm` | Yes | GoReleaser |
 
 ### Triggering Updates from Source Repos
 
@@ -336,9 +349,15 @@ Source repositories trigger automatic manifest updates by sending a `repository_
 
 ```
 scoop-bucket/
+├── bv.json                # Beads Viewer (GoReleaser-managed)
+├── caam.json              # Coding Agent Account Manager (GoReleaser-managed)
 ├── cass.json              # CASS manifest
-├── xf.json                # XF manifest
 ├── cm.json                # CM manifest
+├── dcg.json               # Destructive Command Guard
+├── ntm.json               # Named Tmux Manager (GoReleaser-managed)
+├── slb.json               # Simultaneous Launch Button (GoReleaser-managed)
+├── tru.json               # TOON encoder/decoder
+├── xf.json                # XF manifest
 ├── scripts/
 │   └── update-manifest.sh # Update manifest version/hash
 └── .github/workflows/

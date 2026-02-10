@@ -67,7 +67,7 @@ if [[ "$(uname -o 2>/dev/null)" == "Msys" ]] || [[ -n "${WINDIR:-}" ]]; then
     log "INFO" "Windows detected, delegating to PowerShell"
     PS_FLAGS=()
     [[ "$JSON_MODE" == "true" ]] && PS_FLAGS+=("-Json")
-    powershell.exe -ExecutionPolicy Bypass -File "$SCRIPT_DIR/verify-installation.ps1" "${PS_FLAGS[@]}" "$@"
+    powershell.exe -ExecutionPolicy Bypass -File "$SCRIPT_DIR/verify-installation.ps1" ${PS_FLAGS[@]+"${PS_FLAGS[@]}"} "$@"
     exit $?
 fi
 

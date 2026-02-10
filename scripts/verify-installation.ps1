@@ -103,7 +103,7 @@ function Verify-Tool {
         $versionOutput = & $Tool --version 2>&1 | Out-String
         if ($LASTEXITCODE -eq 0) {
             $version = [regex]::Match($versionOutput, '\d+\.\d+\.\d+').Value
-            Write-Log "INFO" "Version OK" @{ tool = $Tool; version = if ($version) { $version } else { "unknown" }; phase = "version_check" }
+            Write-Log "INFO" "Version OK" @{ tool = $Tool; version = $(if ($version) { $version } else { "unknown" }); phase = "version_check" }
             $phasesPassed++
         }
         else {

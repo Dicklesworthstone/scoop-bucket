@@ -1,0 +1,75 @@
+name: Verify Installation
+
+on:
+  workflow_dispatch:
+    inputs:
+      tool:
+        description: "Specific tool to test (leave empty for all)"
+        required: false
+        type: string
+  schedule:
+    # Weekly Sunday 6am UTC
+    - cron: "0 6 * * 0"
+
+jobs:
+  verify-windows:
+    name: Verify Scoop Installation (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Scoop
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+          if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+            irm get.scoop.sh | iex
+          }
+
+      - name: Add bucket
+        shell: pwsh
+        run: scoop bucket add dicklesworthstone ${{ github.server_url }}/${{ github.repository }}
+
+      - name: Run verification
+        shell: pwsh
+        run: |
+          $tools = "${{ inputs.tool }}"
+          if ($tools) {
+            .\scripts\verify-installation.ps1 -Json $tools 2>&1 | Tee-Object -FilePath verify-output.json
+          } else {
+            .\scripts\verify-installation.ps1 -Json 2>&1 | Tee-Object -FilePath verify-output.json
+          }
+        env:
+          LOG_DIR: ${{ runner.temp }}\verify-install
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-results-windows
+          path: ${{ runner.temp }}\verify-install\
+          if-no-files-found: ignore
+
+  validate-manifests:
+    name: Validate Manifests (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Run manifest validation
+        run: |
+          chmod +x scripts/verify-installation.sh
+          JSON_MODE=true ./scripts/verify-installation.sh 2>&1 | tee verify-output.json
+        env:
+          LOG_DIR: /tmp/verify-install
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-results-manifests
+          path: /tmp/verify-install/
+          if-no-files-found: ignore

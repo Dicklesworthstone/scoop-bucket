@@ -15,7 +15,7 @@ param(
 $ErrorActionPreference = "Continue"
 $BucketName = "dicklesworthstone"
 $BucketUrl = "https://github.com/Dicklesworthstone/scoop-bucket"
-$LogDir = if ($env:LOG_DIR) { $env:LOG_DIR } else { "$env:TEMP\verify-install" }
+$LogDir = $(if ($env:LOG_DIR) { $env:LOG_DIR } else { "$env:TEMP\verify-install" })
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $Total = 0
 $Passed = 0

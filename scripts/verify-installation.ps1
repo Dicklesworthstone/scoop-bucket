@@ -2,7 +2,7 @@
 # Tests: install -> version check -> smoke test -> uninstall -> clean check.
 #
 # Usage:
-#   .\verify-installation.ps1 [-Json] [-Verbose] [-SkipUninstall] [Tool...]
+#   .\verify-installation.ps1 [-Json] [-SkipUninstall] [Tool...]
 #   Omit Tool args to test all manifests in the bucket.
 
 param(

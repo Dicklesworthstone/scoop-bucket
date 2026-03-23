@@ -25,6 +25,9 @@ jobs:
           if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
             irm get.scoop.sh | iex
           }
+          # Scoop modifies the user PATH but that change doesn't propagate to
+          # subsequent GitHub Actions steps.  Explicitly export the shims dir.
+          "$HOME\scoop\shims" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
 
       - name: Add bucket
         shell: pwsh

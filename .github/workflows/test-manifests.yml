@@ -84,6 +84,9 @@ jobs:
         run: |
           Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
           Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+          # Scoop modifies the user PATH but that change doesn't propagate to
+          # subsequent GitHub Actions steps.  Explicitly export the shims dir.
+          "$HOME\scoop\shims" | Out-File -Append -Encoding utf8 $env:GITHUB_PATH
 
       - name: Add local bucket
         shell: pwsh

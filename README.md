@@ -1,8 +1,5 @@
 # Dicklesworthstone Scoop Bucket
 
-[![Test Manifests](https://github.com/Dicklesworthstone/scoop-bucket/actions/workflows/test-manifests.yml/badge.svg)](https://github.com/Dicklesworthstone/scoop-bucket/actions/workflows/test-manifests.yml)
-[![Auto-Update](https://github.com/Dicklesworthstone/scoop-bucket/actions/workflows/auto-update.yml/badge.svg)](https://github.com/Dicklesworthstone/scoop-bucket/actions/workflows/auto-update.yml)
-
 Scoop manifests for the **Dicklesworthstone Stack** - a collection of powerful tools designed for AI coding agents and developer productivity on Windows.
 
 ## Quick Start

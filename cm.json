@@ -1,10 +1,10 @@
 {
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Persistent memory system for AI coding agents using vector embeddings",
   "homepage": "https://github.com/Dicklesworthstone/cass_memory_system",
   "license": "MIT",
-  "url": "https://github.com/Dicklesworthstone/cass_memory_system/releases/download/v0.2.7/cass-memory-windows-x64.exe#/cm.exe",
-  "hash": "6021aa6393fc0f3fb91cda89fc6b550bf10fc6fbee82c6346199609384f57f40",
+  "url": "https://github.com/Dicklesworthstone/cass_memory_system/releases/download/v0.2.8/cass-memory-windows-x64.exe#/cm.exe",
+  "hash": "ae142f924b7716c59a3d9451d40f5819dccff40eae14b94dad4d736555aa06ae",
   "bin": "cm.exe",
   "checkver": {
     "github": "https://github.com/Dicklesworthstone/cass_memory_system"

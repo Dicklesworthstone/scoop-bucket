@@ -1,12 +1,12 @@
 {
-    "version": "0.3.0",
+    "version": "0.3.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Dicklesworthstone/slb/releases/download/v0.3.0/slb_0.3.0_windows_amd64.zip",
+            "url": "https://github.com/Dicklesworthstone/slb/releases/download/v0.3.1/slb_0.3.1_windows_amd64.zip",
             "bin": [
                 "slb.exe"
             ],
-            "hash": "e9d9c8d8143ba2151b51f67ca4f1a6316ebc631963831ec4a5fdbae85e02519b"
+            "hash": "283adbe854569ea3c315e350eda3db8005202b6a8b3501d0b0bb67ba0a439bdc"
         }
     },
     "homepage": "https://github.com/Dicklesworthstone/slb",

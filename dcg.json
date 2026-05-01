@@ -1,12 +1,12 @@
 {
-  "version": "0.4.5",
+  "version": "0.4.6",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/Dicklesworthstone/destructive_command_guard/releases/download/v0.4.5/dcg-x86_64-pc-windows-msvc.zip",
+      "url": "https://github.com/Dicklesworthstone/destructive_command_guard/releases/download/v0.4.6/dcg-x86_64-pc-windows-msvc.zip",
       "bin": [
         "dcg.exe"
       ],
-      "hash": "1ccbaee065d8aa0c21bd8a0871e17b4143dc419177b11a1f47be787dcfc5a423"
+      "hash": "ce95d9c7445dd64bfbc7fc9bb8d448709e6c2ea9a82dff7fa74b4133fc1e4b11"
     }
   },
   "homepage": "https://github.com/Dicklesworthstone/destructive_command_guard",

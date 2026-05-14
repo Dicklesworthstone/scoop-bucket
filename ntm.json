@@ -1,12 +1,12 @@
 {
-    "version": "1.15.0",
+    "version": "1.15.1",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Dicklesworthstone/ntm/releases/download/v1.15.0/ntm_1.15.0_windows_amd64.zip",
+            "url": "https://github.com/Dicklesworthstone/ntm/releases/download/v1.15.1/ntm_1.15.1_windows_amd64.zip",
             "bin": [
                 "ntm.exe"
             ],
-            "hash": "5b828ee6809afada707a3cce4db7fa013f4aa1d8ab54fbfc525b006c60187cce"
+            "hash": "bb17ad5e05a27bf701f3f5142a7a22b1029eb8056ab694823696a8cf2af03363"
         }
     },
     "homepage": "https://github.com/Dicklesworthstone/ntm",

@@ -1,29 +1,15 @@
 {
-    "version": "0.16.1",
+    "version": "0.16.4",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Dicklesworthstone/beads_viewer/releases/download/v0.16.1/bv_0.16.1_windows_amd64.zip",
+            "url": "https://github.com/Dicklesworthstone/beads_viewer/releases/download/v0.16.4/bv_windows_amd64.zip",
             "bin": [
                 "bv.exe"
             ],
-            "hash": "087572654006b81b069cdd0d6055b29b3d3b06bb7835e23d8de957b460ff8951"
+            "hash": "8d518a62f17c8bd4848daacd3bc08c382dfddc24ee315ab48ecfffb20916b5fd"
         }
     },
     "homepage": "https://github.com/Dicklesworthstone/beads_viewer",
     "license": "MIT",
-    "description": "Graph-aware task management TUI for beads projects",
-    "checkver": {
-        "github": "https://github.com/Dicklesworthstone/beads_viewer"
-    },
-    "autoupdate": {
-        "architecture": {
-            "64bit": {
-                "url": "https://github.com/Dicklesworthstone/beads_viewer/releases/download/v$version/bv_${version}_windows_amd64.zip",
-                "hash": {
-                    "url": "https://github.com/Dicklesworthstone/beads_viewer/releases/download/v$version/SHA256SUMS",
-                    "regex": "([a-fA-F0-9]{64})\\s+$basename"
-                }
-            }
-        }
-    }
+    "description": "Graph-aware task management TUI for beads projects"
 }

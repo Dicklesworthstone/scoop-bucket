@@ -1,12 +1,12 @@
 {
-  "version": "0.6.12",
+  "version": "0.6.13",
   "description": "Cross-agent session search - index and search AI coding agent conversations",
   "homepage": "https://github.com/Dicklesworthstone/coding_agent_session_search",
   "license": "MIT",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/Dicklesworthstone/coding_agent_session_search/releases/download/v0.6.12/cass-windows-amd64.zip",
-      "hash": "Not"
+      "url": "https://github.com/Dicklesworthstone/coding_agent_session_search/releases/download/v0.6.13/cass-windows-amd64.zip",
+      "hash": "7b44de3c4e8298d26a5124cde3693df2da24f2694595e553cf2102c2fcab2dc0"
     }
   },
   "bin": "cass.exe",

@@ -6,7 +6,7 @@
   "architecture": {
     "64bit": {
       "url": "https://github.com/Dicklesworthstone/coding_agent_session_search/releases/download/v0.6.21/cass-windows-amd64.zip",
-      "hash": "Not"
+      "hash": "20e131a9b8a06e63fb4f6ffa3c9dd3941c8b753cf5a96943d5c04d24b4bb5540"
     }
   },
   "bin": "cass.exe",

@@ -1,0 +1,10 @@
+# === multi-repo ephemeral patterns 2026-08-10 ===
+.DS_Store
+**/.DS_Store
+.ee/
+.ntm/
+.wrangler/
+.claude/
+.repo_janitor_workspace/
+.skill-loop-progress.md
+.skill-loop-progress-*.md

@@ -71,35 +71,11 @@ jobs:
             exit 1
           fi
 
-          # Get new checksum based on tool
-          case "$TOOL" in
-            cass)
-              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/coding_agent_session_search/releases/download/v${VERSION}/coding-agent-search-x86_64-pc-windows-msvc.zip.sha256" | cut -d' ' -f1)
-              ;;
-            xf)
-              SUMS=$(curl -sL "https://github.com/Dicklesworthstone/xf/releases/download/v${VERSION}/SHA256SUMS")
-              CHECKSUM=$(echo "$SUMS" | grep "x86_64-pc-windows-msvc" | cut -d' ' -f1)
-              ;;
-            cm)
-              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/cass_memory_system/releases/download/v${VERSION}/cass-memory-windows-x64.exe.sha256" | cut -d' ' -f1)
-              ;;
-            dcg)
-              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/destructive_command_guard/releases/download/v${VERSION}/dcg-x86_64-pc-windows-msvc.zip.sha256" | cut -d' ' -f1)
-              ;;
-            tru)
-              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/toon_rust/releases/download/v${VERSION}/toon-windows-amd64.zip.sha256" | cut -d' ' -f1)
-              ;;
-          esac
-
-          echo "New checksum: $CHECKSUM"
-
-          # Update manifest (version, hash, and URL)
-          jq --arg version "$VERSION" --arg hash "$CHECKSUM" '
-            .version = $version |
-            (if .architecture then .architecture."64bit".hash = $hash else .hash = $hash end) |
-            (if .architecture then .architecture."64bit".url = (.architecture."64bit".url | gsub("v[0-9.]+"; "v" + $version)) else .url = (.url | gsub("v[0-9.]+"; "v" + $version)) end)
-          ' "$MANIFEST" > "${MANIFEST}.tmp"
-          mv "${MANIFEST}.tmp" "$MANIFEST"
+          # Download the real Windows asset, hash it, cross-check the .sha256
+          # sidecar, and refuse to write anything that is not a 64-hex digest.
+          # (The old inline "curl sidecar | cut" turned a 404 body into the
+          # literal hash "Not" -- see scoop-bucket#5.)
+          ./scripts/update-manifest.sh "$TOOL" "$VERSION"
 
       - name: Commit and push
         run: |
@@ -187,35 +163,11 @@ jobs:
           VERSION="${{ steps.latest.outputs.version }}"
           MANIFEST="${TOOL}.json"
 
-          # Get new checksum based on tool
-          case "$TOOL" in
-            cass)
-              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/coding_agent_session_search/releases/download/v${VERSION}/coding-agent-search-x86_64-pc-windows-msvc.zip.sha256" | cut -d' ' -f1)
-              ;;
-            xf)
-              SUMS=$(curl -sL "https://github.com/Dicklesworthstone/xf/releases/download/v${VERSION}/SHA256SUMS")
-              CHECKSUM=$(echo "$SUMS" | grep "x86_64-pc-windows-msvc" | cut -d' ' -f1)
-              ;;
-            cm)
-              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/cass_memory_system/releases/download/v${VERSION}/cass-memory-windows-x64.exe.sha256" | cut -d' ' -f1)
-              ;;
-            dcg)
-              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/destructive_command_guard/releases/download/v${VERSION}/dcg-x86_64-pc-windows-msvc.zip.sha256" | cut -d' ' -f1)
-              ;;
-            tru)
-              CHECKSUM=$(curl -sL "https://github.com/Dicklesworthstone/toon_rust/releases/download/v${VERSION}/toon-windows-amd64.zip.sha256" | cut -d' ' -f1)
-              ;;
-          esac
-
-          echo "New checksum: $CHECKSUM"
-
-          # Update manifest (version, hash, and URL)
-          jq --arg version "$VERSION" --arg hash "$CHECKSUM" '
-            .version = $version |
-            (if .architecture then .architecture."64bit".hash = $hash else .hash = $hash end) |
-            (if .architecture then .architecture."64bit".url = (.architecture."64bit".url | gsub("v[0-9.]+"; "v" + $version)) else .url = (.url | gsub("v[0-9.]+"; "v" + $version)) end)
-          ' "$MANIFEST" > "${MANIFEST}.tmp"
-          mv "${MANIFEST}.tmp" "$MANIFEST"
+          # Download the real Windows asset, hash it, cross-check the .sha256
+          # sidecar, and refuse to write anything that is not a 64-hex digest.
+          # (The old inline "curl sidecar | cut" turned a 404 body into the
+          # literal hash "Not" -- see scoop-bucket#5.)
+          ./scripts/update-manifest.sh "$TOOL" "$VERSION"
 
       - name: Commit and push
         if: steps.compare.outputs.needs_update == 'true'

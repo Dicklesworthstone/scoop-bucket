@@ -115,11 +115,16 @@ validate_manifest() {
         return 1
     fi
 
-    # Validate hash field exists
+    # Validate the pinned hash is a real sha256 digest. An empty string or a
+    # stray error fragment (the literal "Not" from a 404 body, scoop-bucket#5)
+    # means Scoop cannot verify what it downloads, so this is a hard failure.
     local hash
     hash=$(jq -r '.architecture."64bit".hash // .hash // empty' "$manifest")
-    if [[ -z "$hash" ]]; then
-        log "WARN" "Missing hash field" "tool" "$tool"
+    if [[ ! "$hash" =~ ^[0-9a-fA-F]{64}$ ]]; then
+        log "ERROR" "Pinned hash is not a sha256 digest" "tool" "$tool" "hash" "${hash:-<empty>}"
+        FAILED=$((FAILED + 1))
+        RESULTS_ARRAY+=("{\"tool\":\"$tool\",\"result\":\"fail\",\"phase\":\"hash_check\"}")
+        return 1
     fi
 
     # Validate URL is reachable (HEAD request with timeout)

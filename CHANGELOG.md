@@ -8,6 +8,12 @@ Repository: <https://github.com/Dicklesworthstone/scoop-bucket>
 
 ---
 
+## 2026-09-04 -- ntm v1.32.0
+
+- **ntm** manifest updated to **v1.32.0** (Windows amd64 zip URL and SHA256 from the release's `SHA256SUMS`); it had been left at 1.30.0 while v1.31.0 shipped.
+
+---
+
 ## Current Manifest Versions (as of 2026-03-21)
 
 | Manifest | Tool | Version | First Added | Update Method |

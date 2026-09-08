@@ -26,6 +26,7 @@ scoop install dicklesworthstone/cass
 
 | Tool | Description | Install |
 |------|-------------|---------|
+| **[br](https://github.com/Dicklesworthstone/beads_rust)** | Beads Rust - Dependency-aware issue tracking with SQLite and JSONL sync | `scoop install dicklesworthstone/br` |
 | **[bv](https://github.com/Dicklesworthstone/beads_viewer)** | Beads Viewer - Graph-aware task management TUI | `scoop install dicklesworthstone/bv` |
 | **[caam](https://github.com/Dicklesworthstone/coding_agent_account_manager)** | Coding Agent Account Manager - Switch between AI agent accounts | `scoop install dicklesworthstone/caam` |
 | **[slb](https://github.com/Dicklesworthstone/simultaneous_launch_button)** | Simultaneous Launch Button - Two-person rule for dangerous commands | `scoop install dicklesworthstone/slb` |
@@ -313,6 +314,7 @@ For source repositories to trigger automatic manifest updates via `repository_di
 
 | Repository | Has Windows Build | Update Method |
 |------------|-------------------|---------------|
+| `beads_rust` (br) | Yes | DSR release and manual manifest update |
 | `coding_agent_session_search` (cass) | Yes | Auto-update workflow |
 | `xf` | Yes | Auto-update workflow |
 | `cass_memory_system` (cm) | Yes | Auto-update workflow |
@@ -346,6 +348,7 @@ Source repositories trigger automatic manifest updates by sending a `repository_
 
 ```
 scoop-bucket/
+├── br.json                # Beads Rust (DSR release)
 ├── bv.json                # Beads Viewer (GoReleaser-managed)
 ├── caam.json              # Coding Agent Account Manager (GoReleaser-managed)
 ├── cass.json              # CASS manifest

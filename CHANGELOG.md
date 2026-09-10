@@ -8,6 +8,17 @@ Repository: <https://github.com/Dicklesworthstone/scoop-bucket>
 
 ---
 
+## 2026-09-09 -- ntm v1.33.1, dcg v0.14.2
+
+- **ntm** manifest updated to **v1.33.1**; it had been left at 1.32.0 while v1.33.0 and v1.33.1 shipped. Windows amd64 zip URL and SHA256 taken from the release's own `SHA256SUMS`.
+- **dcg** manifest updated to **v0.14.2**; it had been left at 0.14.0 while v0.14.1 and v0.14.2 shipped. SHA256 taken from the release's `dcg-x86_64-pc-windows-msvc.zip.sha256` sidecar.
+
+Both hashes were re-verified by downloading the published zips and hashing them locally. `scripts/lint-manifests.sh` reports 10 manifests checked, 0 failures.
+
+Not done: dcg also publishes `dcg-aarch64-pc-windows-msvc.zip`, but this bucket has never carried an `arm64` architecture block for any manifest, so adding Windows-on-ARM support is left as a separate decision.
+
+---
+
 ## 2026-09-04 -- ntm v1.32.0
 
 - **ntm** manifest updated to **v1.32.0** (Windows amd64 zip URL and SHA256 from the release's `SHA256SUMS`); it had been left at 1.30.0 while v1.31.0 shipped.

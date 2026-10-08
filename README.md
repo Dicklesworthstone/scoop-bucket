@@ -208,9 +208,19 @@ cd /path/to/scoop-bucket
 ```
 
 The script will:
-1. Fetch the new checksum from GitHub releases
-2. Update the version, hash, and URL in the manifest
+1. Download and hash every declared architecture, checking published SHA256 sidecars when available
+2. Update the version, hashes, and URLs only after every asset verifies
 3. Show the git diff for review
+
+To review a candidate while retaining the downloads and leaving the input manifest untouched, use a fresh output path and an existing work directory:
+
+```bash
+./scripts/update-manifest.sh dcg 0.15.3 \
+  --manifest dcg.json --output /path/to/fresh/dcg.candidate.json \
+  --work-root /path/to/existing/work-directory --retain-work
+```
+
+`--output` refuses an existing file. A missing asset or a sidecar hash mismatch fails without writing a candidate. `--retain-work` requires both `--output` and `--work-root`.
 
 ### Manifest Structure
 
